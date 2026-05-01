@@ -6,6 +6,9 @@ import { ParaderosModule } from './paraderos/paraderos.module';
 import { BoletosModule } from './boletos/boletos.module';
 import { NodosModule } from './nodos/nodos.module';
 import { HistoriasModule } from './historias/historias.module';
+import { EmpresasModule } from './empresas/empresas.module';
+import { BusesModule } from './buses/buses.module';
+import { GpsModule } from './gps/gps.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { HistoriasModule } from './historias/historias.module';
     BoletosModule,
     NodosModule,
     HistoriasModule,
+    EmpresasModule,
+    BusesModule,
+    GpsModule,
   ],
 })
 export class AppModule {}

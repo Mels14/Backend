@@ -12,6 +12,6 @@ export class Nodo {
     ruta?: Ruta;
 
     @ManyToOne(() => Paradero, (paradero) => paradero.nodos, { onDelete: 'CASCADE' } )
-    @JoinColumn({ name: 'ruta_id'})
+    @JoinColumn({ name: 'paradero_id'}) // Error corregido (antes decía 'ruta_id')
     paradero?: Paradero;
 }

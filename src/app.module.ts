@@ -9,6 +9,12 @@ import { HistoriasModule } from './historias/historias.module';
 import { EmpresasModule } from './empresas/empresas.module';
 import { BusesModule } from './buses/buses.module';
 import { GpsModule } from './gps/gps.module';
+import { ProgramacionesModule } from './programaciones/programaciones.module';
+import { MetodospagoModule } from './metodospago/metodospago.module';
+import { MetodospagociudadanoModule } from './metodospagociudadano/metodospagociudadano.module';
+import { ReportesModule } from './reportes/reportes.module';
+import { TransaccionesModule } from './transacciones/transacciones.module';
+
 
 @Module({
   imports: [
@@ -35,6 +41,11 @@ import { GpsModule } from './gps/gps.module';
     EmpresasModule,
     BusesModule,
     GpsModule,
+    ProgramacionesModule,
+    MetodospagoModule,
+    MetodospagociudadanoModule,
+    ReportesModule,
+    TransaccionesModule,
   ],
 })
 export class AppModule {}

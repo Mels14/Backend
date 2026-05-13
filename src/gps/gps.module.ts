@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GPS } from 'src/gps/entities/gps.entity';
+import { GPS } from '../gps/entities/gps.entity';
 import { GpsService } from './gps.service';
 import { GpsController } from './gps.controller';
 

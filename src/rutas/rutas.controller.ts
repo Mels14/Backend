@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { RutasService } from './rutas.service';
 import { CreateRutaDto } from './dto/create-ruta.dto';
 import { UpdateRutaDto } from './dto/update-ruta.dto';
 
 @Controller('rutas')
 export class RutasController {
-  constructor(private readonly rutasService: RutasService) {}
 
-  @Post()
-  create(@Body() createRutaDto: CreateRutaDto) {
-    return this.rutasService.create(createRutaDto);
-  }
+    constructor(private readonly rutasService: RutasService) {}
 
-  @Get()
-  findAll() {
-    return this.rutasService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.rutasService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rutasService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.rutasService.findOne(id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRutaDto: UpdateRutaDto) {
-    return this.rutasService.update(+id, updateRutaDto);
-  }
+    // GET /rutas/:id/tiempo-total
+    @Get(':id/tiempo-total')
+    tiempoTotal(@Param('id', ParseIntPipe) id: number) {
+        return this.rutasService.tiempoTotal(id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rutasService.remove(+id);
-  }
+    @Post()
+    create(@Body() dto: CreateRutaDto) {
+        return this.rutasService.create(dto);
+    }
+
+    @Put(':id')
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: UpdateRutaDto,
+    ) {
+        return this.rutasService.update(id, dto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.rutasService.remove(id);
+    }
 }

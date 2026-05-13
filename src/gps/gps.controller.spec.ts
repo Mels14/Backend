@@ -17,6 +17,6 @@ describe('GpsController', () => {
   });
 
   it('should be defined', () => {
-    expectCookies(controller).toBeDefined ();
+    expectCookies(controller).toBeDefined();
   });
 });

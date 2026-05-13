@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GPS } from 'src/gps/entities/gps.entity';
+import { GPS } from '../gps/entities/gps.entity';
 import { UpdateGpsDto } from 'src/gps/dto/update-gps.dto';
 
 @Injectable()

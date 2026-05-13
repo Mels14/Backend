@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Empresa } from "../../empresas/entities/empresa.entity";
-import { GPS } from "src/gps/entities/gps.entity";
+import { GPS } from "../../gps/entities/gps.entity";
 
 @Entity('buses')
 export class Bus {

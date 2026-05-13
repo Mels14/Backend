@@ -1,17 +1,16 @@
 import { DataSource } from 'typeorm';
-import 'dotenv/config'; // Carga las variables del archivo .env
+import { ConfigModule } from '@nestjs/config';
 
-const dataSource = new DataSource({
-  type: 'mysql',
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  // Para CLI (ts-node) y para runtime compilado (dist)
-  entities: ['src/**/*.entity{.ts,.js}', 'dist/**/*.entity.js'],
-  migrations: ['src/migrations/*{.ts,.js}', 'dist/migrations/*.js'],
-  synchronize: false,
+ConfigModule.forRoot();
+
+export default new DataSource({
+    type: 'mysql',
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 3306,
+    username: process.env.DB_USER || 'admin_proyecto',
+    password: process.env.DB_PASS || 'proyecto123',
+    database: process.env.DB_NAME || 'proyecto_db',
+    entities: [__dirname + '/src/**/*.entity{.ts,.js}'],
+    migrations: [__dirname + '/src/migrations/*{.ts,.js}'],
+    synchronize: false,
 });
-
-export default dataSource;

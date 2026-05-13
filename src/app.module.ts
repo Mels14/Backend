@@ -9,8 +9,18 @@ import { HistoriasModule } from './historias/historias.module';
 import { EmpresasModule } from './empresas/empresas.module';
 import { BusesModule } from './buses/buses.module';
 import { GpsModule } from './gps/gps.module';
+import { PersonasModule } from './personas/personas.module';
+import { APP_GUARD } from '@nestjs/core';
+import { SecurityGuard } from './guards/security/security.guard';
+import { ConductoresModule } from './conductores/conductores.module';
+import { FotosModule } from './fotos/fotos.module';
+import { IncidentesModule } from './incidentes/incidentes.module';
+import { ComentariosIncidentesModule } from './comentarios_incidentes/comentarios_incidentes.module';
+import { TurnosModule } from './turnos/turnos.module';
+import { NotificacionesModule } from './gateways/notifications/notifications.module';
 
 @Module({
+  providers: [{ provide: APP_GUARD, useClass: SecurityGuard }],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
@@ -35,6 +45,13 @@ import { GpsModule } from './gps/gps.module';
     EmpresasModule,
     BusesModule,
     GpsModule,
+    PersonasModule,
+    ConductoresModule,
+    FotosModule,
+    IncidentesModule,
+    ComentariosIncidentesModule,
+    TurnosModule,
+    NotificacionesModule,
   ],
 })
 export class AppModule {}

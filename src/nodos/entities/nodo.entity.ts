@@ -1,17 +1,26 @@
-import { Paradero } from "src/paraderos/entities/paradero.entity";
-import { Ruta } from "src/rutas/entities/ruta.entity";
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Paradero } from "../../paraderos/entities/paradero.entity";
+import { Ruta } from "../../rutas/entities/ruta.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('nodos')
 export class Nodo {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @ManyToOne(() => Ruta, (ruta) => ruta.nodos, { onDelete: 'CASCADE' } )
-    @JoinColumn({ name: 'ruta_id'})
+    @Column()
+    orden?: number;
+
+    @Column('decimal', { precision: 10, scale: 2, nullable: true })
+    distanciaDesdeAnterior?: number;
+
+    @Column({ nullable: true })
+    tiempoEstimado?: number; // en minutos
+
+    @ManyToOne(() => Ruta, (ruta) => ruta.nodos, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'ruta_id' })
     ruta?: Ruta;
 
-    @ManyToOne(() => Paradero, (paradero) => paradero.nodos, { onDelete: 'CASCADE' } )
-    @JoinColumn({ name: 'paradero_id'}) // Error corregido (antes decía 'ruta_id')
+    @ManyToOne(() => Paradero, (paradero) => paradero.nodos, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'paradero_id' })
     paradero?: Paradero;
 }

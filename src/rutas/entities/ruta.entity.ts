@@ -1,5 +1,5 @@
-import { Nodo } from "src/nodos/entities/nodo.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Nodo } from "../../nodos/entities/nodo.entity";
 
 @Entity('rutas')
 export class Ruta {
@@ -7,15 +7,20 @@ export class Ruta {
     id?: number;
 
     @Column()
-    name?: string;
+    nombre?: string;
 
-    @Column()
+    @Column({ unique: true })
+    codigo?: string;
+
+    @Column({ type: 'text', nullable: true })
     descripcion?: string;
 
-    @Column()
-    tarifa?: number
+    @Column('decimal', { precision: 10, scale: 2 })
+    tarifa?: number;
 
-    @OneToMany(()=> Nodo, (nodo)=>nodo.paradero)
+    @Column({ default: true })
+    activa?: boolean;
+
+    @OneToMany(() => Nodo, (nodo) => nodo.ruta, { cascade: true })
     nodos?: Nodo[];
-
 }

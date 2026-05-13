@@ -8,6 +8,16 @@ import { BoletosModule } from './boletos/boletos.module';
 import { HistoriasModule } from './historias/historias.module';
 import { APP_GUARD } from '@nestjs/core';
 import { SecurityGuard } from './guards/security.guard';
+import { EmpresasModule } from './empresas/empresas.module';
+import { BusesModule } from './buses/buses.module';
+import { GpsModule } from './gps/gps.module';
+import { ProgramacionesModule } from './programaciones/programaciones.module';
+import { MetodospagoModule } from './metodospago/metodospago.module';
+import { MetodospagociudadanoModule } from './metodospagociudadano/metodospagociudadano.module';
+import { ReportesModule } from './reportes/reportes.module';
+import { TransaccionesModule } from './transacciones/transacciones.module';
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,6 +40,16 @@ import { SecurityGuard } from './guards/security.guard';
     NodosModule,
     BoletosModule,
     HistoriasModule,
+    ProgramacionesModule,
+    BusesModule,
+    EmpresasModule,
+    BusesModule,
+    GpsModule,
+    ProgramacionesModule,
+    MetodospagoModule,
+    MetodospagociudadanoModule,
+    ReportesModule,
+    TransaccionesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: SecurityGuard },

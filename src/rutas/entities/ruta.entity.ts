@@ -25,4 +25,7 @@ export class Ruta {
     @OneToMany(() => Programacion, (prog) => prog.ruta)
     programaciones!: Programacion[];
 
+    @OneToMany(() => Programacion, (programacion) => programacion.ruta)
+    programaciones?: Programacion[];
 }
+

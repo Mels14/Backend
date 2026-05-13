@@ -19,6 +19,12 @@ export class ParaderosController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    /* Sólo en caso de que haya algún tipo de error, se puede colocar lo siguiente:
+    const numericId = +id;
+    if (isNaN(numericId)) {
+      Se maneja o se coloca un log con el error que lo puede causar
+    }
+   */
     return this.paraderosService.findOne(+id);
   }
 

@@ -6,8 +6,20 @@ import { ParaderosModule } from './paraderos/paraderos.module';
 import { BoletosModule } from './boletos/boletos.module';
 import { NodosModule } from './nodos/nodos.module';
 import { HistoriasModule } from './historias/historias.module';
+<<<<<<< HEAD
 import { ProgramacionesModule } from './programaciones/programaciones.module';
 import { BusesModule } from './buses/buses.module';
+=======
+import { EmpresasModule } from './empresas/empresas.module';
+import { BusesModule } from './buses/buses.module';
+import { GpsModule } from './gps/gps.module';
+import { ProgramacionesModule } from './programaciones/programaciones.module';
+import { MetodospagoModule } from './metodospago/metodospago.module';
+import { MetodospagociudadanoModule } from './metodospagociudadano/metodospagociudadano.module';
+import { ReportesModule } from './reportes/reportes.module';
+import { TransaccionesModule } from './transacciones/transacciones.module';
+
+>>>>>>> respaldo-hu011-hu016
 
 @Module({
   imports: [
@@ -31,8 +43,19 @@ import { BusesModule } from './buses/buses.module';
     BoletosModule,
     NodosModule,
     HistoriasModule,
+<<<<<<< HEAD
     ProgramacionesModule,
     BusesModule,
+=======
+    EmpresasModule,
+    BusesModule,
+    GpsModule,
+    ProgramacionesModule,
+    MetodospagoModule,
+    MetodospagociudadanoModule,
+    ReportesModule,
+    TransaccionesModule,
+>>>>>>> respaldo-hu011-hu016
   ],
 })
 export class AppModule {}

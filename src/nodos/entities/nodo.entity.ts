@@ -1,17 +1,20 @@
-import { Paradero } from "src/paraderos/entities/paradero.entity";
-import { Ruta } from "src/rutas/entities/ruta.entity";
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Ruta } from '../../rutas/entities/ruta.entity';
+import { Paradero } from '../../paraderos/entities/paradero.entity';
 
 @Entity('nodos')
 export class Nodo {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @ManyToOne(() => Ruta, (ruta) => ruta.nodos, { onDelete: 'CASCADE' } )
-    @JoinColumn({ name: 'ruta_id'})
-    ruta?: Ruta;
+  @Column()
+  orden!: number; // posición secuencial en la ruta
 
-    @ManyToOne(() => Paradero, (paradero) => paradero.nodos, { onDelete: 'CASCADE' } )
-    @JoinColumn({ name: 'ruta_id'})
-    paradero?: Paradero;
+  @ManyToOne(() => Ruta, (ruta) => ruta.nodos, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'ruta_id' })
+  ruta!: Ruta;
+
+  @ManyToOne(() => Paradero, (paradero) => paradero.nodos)
+  @JoinColumn({ name: 'paradero_id' })
+  paradero!: Paradero;
 }

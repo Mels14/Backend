@@ -2,13 +2,16 @@ import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateRutaDto {
     @IsString()
-    name?: string;
+    nombre?: string;
 
     @IsString()
     descripcion?: string;
 
     @IsInt()
     tarifa?: number;
+
+    @IsInt()
+    tiempo_estimado?: number;
 
 }
 

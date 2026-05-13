@@ -8,6 +8,9 @@ export class Paradero {
     id?: number;
 
     @Column()
+    nombre?: string;
+
+    @Column()
     latitud?: number;
 
     @Column()

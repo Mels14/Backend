@@ -92,17 +92,24 @@ export class TurnosService {
             throw new NotFoundException('No hay turno programado para este conductor');
         }
 
+        console.log("Turno encontrado:", turno);
+        console.log("GPS:", turno.bus?.gps);
+
         // Validar que la fecha programada sea la de hoy (estricta)
         if (turno.fechaProgramada) {
             const fechaProgramada = new Date(turno.fechaProgramada);
+            const diferenciaMs = Math.abs(ahora.getTime() - fechaProgramada.getTime());
+            const diferenciaMinutos = diferenciaMs / (1000 * 60);
+
+            console.log("Ahora:", ahora);
+            console.log("Programada:", fechaProgramada);
+            console.log("Diferencia:", diferenciaMinutos);
 
             const mismoAnio = fechaProgramada.getFullYear() === ahora.getFullYear();
             const mismoMes = fechaProgramada.getMonth() === ahora.getMonth();
             const mismoDia = fechaProgramada.getDate() === ahora.getDate();
-            const mismaHora = fechaProgramada.getHours() === ahora.getHours();
-            const mismoMinuto = fechaProgramada.getMinutes() === ahora.getMinutes();
 
-            if (!mismoAnio || !mismoMes || !mismoDia || !mismaHora || !mismoMinuto) {
+            if (!mismoAnio || !mismoMes || !mismoDia || diferenciaMinutos > 5) {
                 throw new BadRequestException(
                     `El turno está programado para ${fechaProgramada.toLocaleString()}. ` +
                     `No puede iniciarse en este momento.`
@@ -120,6 +127,8 @@ export class TurnosService {
         turno.fechaInicio = ahora;
 
         const turnoActualizado = await this.turnoRepository.save(turno);
+
+        
 
         // Activar GPS del bus
         if (turno.bus?.gps?.id) {

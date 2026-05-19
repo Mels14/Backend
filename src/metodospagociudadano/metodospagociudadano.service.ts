@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CreateMetodoPagoCiudadanoDto } from './dto/create-metodospagociudadano.dto';
 import { UpdateMetodospagociudadanoDto } from './dto/update-metodospagociudadano.dto';
+
 import { MetodoPagoCiudadano } from './entities/metodospagociudadano.entity';
 import { MetodosPagoService } from '../metodospago/metodospago.service';
 import { Transaccion } from '../transacciones/entities/transacciones.entity';
 
 @Injectable()
 export class MetodosPagoCiudadanoService {
+
   constructor(
+
     @InjectRepository(MetodoPagoCiudadano)
     private readonly mpcRepository: Repository<MetodoPagoCiudadano>,
 
@@ -20,133 +24,346 @@ export class MetodosPagoCiudadanoService {
 
   ) {}
 
+  // =========================
+  // RESOLVER ID
+  // =========================
+
   private resolveId(value: any): number | undefined {
+
     if (!value) return undefined;
+
     if (typeof value === 'number') return value;
-    if (typeof value === 'object' && 'id' in value) return (value as any).id;
+
+    if (typeof value === 'object' && 'id' in value) {
+      return (value as any).id;
+    }
+
     return undefined;
   }
 
-  async create(createMetodoPagoCiudadanoDto: CreateMetodoPagoCiudadanoDto): Promise<MetodoPagoCiudadano> {
-    const metodospagoId = this.resolveId(createMetodoPagoCiudadanoDto.metodopago);
+  // =========================
+  // CREAR
+  // =========================
 
-    if (!metodospagoId) throw new BadRequestException('MetodoPago id is required');
+  async create(
+    createMetodoPagoCiudadanoDto: CreateMetodoPagoCiudadanoDto
+  ): Promise<MetodoPagoCiudadano> {
 
-    const metodopago = await this.metodospagoService.findOne(metodospagoId);
-    if (!metodopago) throw new NotFoundException(`MetodoPago with id ${metodospagoId} not found`);
+    const metodospagoId = this.resolveId(
+      createMetodoPagoCiudadanoDto.metodopago
+    );
+
+    if (!metodospagoId) {
+      throw new BadRequestException(
+        'MetodoPago id is required'
+      );
+    }
+
+    const metodopago =
+      await this.metodospagoService.findOne(metodospagoId);
+
+    if (!metodopago) {
+      throw new NotFoundException(
+        `MetodoPago with id ${metodospagoId} not found`
+      );
+    }
 
     const metodopagociudadano = this.mpcRepository.create({
-      id_ciudadano: createMetodoPagoCiudadanoDto.id_ciudadano, 
-      saldo: createMetodoPagoCiudadanoDto.saldo,
-      monto: createMetodoPagoCiudadanoDto.monto,
-      cargo: createMetodoPagoCiudadanoDto.cargo,
+
+      id_ciudadano:
+        createMetodoPagoCiudadanoDto.id_ciudadano,
+
+      saldo:
+        createMetodoPagoCiudadanoDto.saldo,
+
+      monto:
+        createMetodoPagoCiudadanoDto.monto,
+
+      cargo:
+        createMetodoPagoCiudadanoDto.cargo,
+
       metodopago,
+
     });
 
     return this.mpcRepository.save(metodopagociudadano);
-
   }
+
+  // =========================
+  // OBTENER TODOS
+  // =========================
 
   findAll(): Promise<MetodoPagoCiudadano[]> {
-    return this.mpcRepository.find({ relations: ['metodopago'] });
-  }
 
-  async findOne(id: number): Promise<MetodoPagoCiudadano> {
-    const metodopagociudadano = await this.mpcRepository.findOne({
-      where: { id },
+    return this.mpcRepository.find({
       relations: ['metodopago'],
     });
-    if (!metodopagociudadano) throw new NotFoundException(`MetodoPagoCiudadano with id ${id} not found`);
+  }
+
+  // =========================
+  // OBTENER UNO
+  // =========================
+
+  async findOne(id: number): Promise<MetodoPagoCiudadano> {
+
+    const metodopagociudadano =
+      await this.mpcRepository.findOne({
+
+        where: { id },
+
+        relations: ['metodopago'],
+      });
+
+    if (!metodopagociudadano) {
+
+      throw new NotFoundException(
+        `MetodoPagoCiudadano with id ${id} not found`
+      );
+    }
+
     return metodopagociudadano;
   }
 
-  async update(id: number, UpdateMetodospagociudadanoDto: UpdateMetodospagociudadanoDto): Promise<MetodoPagoCiudadano> {
-    const metodopagociudadano = await this.mpcRepository.findOne({ where: { id } });
-    if (!metodopagociudadano) throw new NotFoundException(`MetodoPagoCiudadano with id ${id} not found`);
+  // =========================
+  // ACTUALIZAR
+  // =========================
+
+  async update(
+    id: number,
+    UpdateMetodospagociudadanoDto: UpdateMetodospagociudadanoDto
+  ): Promise<MetodoPagoCiudadano> {
+
+    const metodopagociudadano =
+      await this.mpcRepository.findOne({
+        where: { id }
+      });
+
+    if (!metodopagociudadano) {
+
+      throw new NotFoundException(
+        `MetodoPagoCiudadano with id ${id} not found`
+      );
+    }
+
+    // =========================
+    // ACTUALIZAR CAMPOS
+    // =========================
+
+    metodopagociudadano.id_ciudadano =
+      UpdateMetodospagociudadanoDto.id_ciudadano ??
+      metodopagociudadano.id_ciudadano;
+
+    metodopagociudadano.saldo =
+      UpdateMetodospagociudadanoDto.saldo ??
+      metodopagociudadano.saldo;
+
+    metodopagociudadano.monto =
+      UpdateMetodospagociudadanoDto.monto ??
+      metodopagociudadano.monto;
+
+    metodopagociudadano.cargo =
+      UpdateMetodospagociudadanoDto.cargo ??
+      metodopagociudadano.cargo;
+
+    // =========================
+    // ACTUALIZAR MÉTODO DE PAGO
+    // =========================
 
     if (UpdateMetodospagociudadanoDto.metodopago) {
-      const metodopagoId = this.resolveId(UpdateMetodospagociudadanoDto.metodopago);
-      if (!metodopagoId) throw new BadRequestException('MetodoPago id is required');
-      const metodopago= await this.metodospagoService.findOne(metodopagoId);
-      if (!metodopago) throw new NotFoundException(`MetodoPago with id ${metodopagoId} not found`);
+
+      const metodopagoId = this.resolveId(
+        UpdateMetodospagociudadanoDto.metodopago
+      );
+
+      if (!metodopagoId) {
+
+        throw new BadRequestException(
+          'MetodoPago id is required'
+        );
+      }
+
+      const metodopago =
+        await this.metodospagoService.findOne(metodopagoId);
+
+      if (!metodopago) {
+
+        throw new NotFoundException(
+          `MetodoPago with id ${metodopagoId} not found`
+        );
+      }
+
       metodopagociudadano.metodopago = metodopago;
     }
 
+    // =========================
+    // GUARDAR
+    // =========================
+
     await this.mpcRepository.save(metodopagociudadano);
+
     return this.findOne(id);
   }
 
+  // =========================
+  // ELIMINAR
+  // =========================
+
   async remove(id: number): Promise<void> {
-    const metodopagociudadano = await this.findOne(id);
-    await this.mpcRepository.remove(metodopagociudadano);
+
+    const metodopagociudadano =
+      await this.findOne(id);
+
+    await this.mpcRepository.remove(
+      metodopagociudadano
+    );
   }
 
-  async iniciarRecarga(id: number, monto: number, email:string) {
-      const mpc = await this.findOne(id);
-      const referencia = `RECARGA-${id}-${Date.now()}`;
-      return {
-          referencia,
-          monto,
-          cargo : (monto * 0.029) + 900,
-          descripcion: `Recarga tarjeta transporte #${id}`,
-          email,
-      };
-  }
+  // =========================
+  // INICIAR RECARGA
+  // =========================
 
-  async confirmarRecarga(referencia: string, estado: string, monto: number) {
-      const id = parseInt(referencia.split('-')[1]);
-      const mpc = await this.findOne(id);
-      
-      if (estado === 'Aceptada'){
-        mpc.saldo = (mpc.saldo ?? 0) + monto
-        await this.mpcRepository.save(mpc);
-        const transaccion = this.transaccionesRepository.create({
-        referencia,
-        monto,
-        fecha: new Date(),
-        estado,
-        metodopagociudadano: mpc,
-    });
-    await this.transaccionesRepository.save(transaccion);
+  async iniciarRecarga(
+    id: number,
+    monto: number,
+    email: string
+  ) {
 
-      }
-      
+    const mpc = await this.findOne(id);
+
+    const referencia =
+      `RECARGA-${id}-${Date.now()}`;
+
     return {
-        saldo: mpc.saldo,
-        descripcion: 'Recarga exitosa',
+
+      referencia,
+
+      monto,
+
+      cargo: (monto * 0.029) + 900,
+
+      descripcion:
+        `Recarga tarjeta transporte #${id}`,
+
+      email,
     };
   }
 
-  async findByCiudadano(ciudadano_id: string): Promise<MetodoPagoCiudadano[]> {
-      return this.mpcRepository.find({
-          where: { id_ciudadano: ciudadano_id },
-          relations: ['metodopago'],
-      });
+  // =========================
+  // CONFIRMAR RECARGA
+  // =========================
+
+  async confirmarRecarga(
+    referencia: string,
+    estado: string,
+    monto: number
+  ) {
+
+    const id =
+      parseInt(referencia.split('-')[1]);
+
+    const mpc = await this.findOne(id);
+
+    if (estado === 'Aceptada') {
+
+      mpc.saldo = (mpc.saldo ?? 0) + monto;
+
+      await this.mpcRepository.save(mpc);
+
+      const transaccion =
+        this.transaccionesRepository.create({
+
+          referencia,
+
+          monto,
+
+          fecha: new Date(),
+
+          estado,
+
+          metodopagociudadano: mpc,
+        });
+
+      await this.transaccionesRepository.save(
+        transaccion
+      );
+    }
+
+    return {
+
+      saldo: mpc.saldo,
+
+      descripcion: 'Recarga exitosa',
+    };
   }
 
-  async findOrCreateByCiudadano(ciudadano_id: string): Promise<MetodoPagoCiudadano[]> {
-    const existing = await this.mpcRepository.find({
-        where: { id_ciudadano: ciudadano_id },
-        relations: ['metodopago'],
+  // =========================
+  // BUSCAR POR CIUDADANO
+  // =========================
+
+  async findByCiudadano(
+    ciudadano_id: string
+  ): Promise<MetodoPagoCiudadano[]> {
+
+    return this.mpcRepository.find({
+
+      where: {
+        id_ciudadano: ciudadano_id
+      },
+
+      relations: ['metodopago'],
     });
+  }
 
-    if (existing.length > 0) return existing;
+  // =========================
+  // CREAR AUTOMÁTICAMENTE
+  // =========================
 
-    // No existe — crear uno automáticamente con saldo 0
-    const metodopago = await this.metodospagoService.findOne(1); // método de pago por defecto
-    if (!metodopago) throw new NotFoundException('No hay métodos de pago disponibles');
+  async findOrCreateByCiudadano(
+    ciudadano_id: string
+  ): Promise<MetodoPagoCiudadano[]> {
+
+    const existing =
+      await this.mpcRepository.find({
+
+        where: {
+          id_ciudadano: ciudadano_id
+        },
+
+        relations: ['metodopago'],
+      });
+
+    if (existing.length > 0) {
+      return existing;
+    }
+
+    // Método de pago por defecto
+
+    const metodopago =
+      await this.metodospagoService.findOne(1);
+
+    if (!metodopago) {
+
+      throw new NotFoundException(
+        'No hay métodos de pago disponibles'
+      );
+    }
 
     const nuevo = this.mpcRepository.create({
-        id_ciudadano: ciudadano_id,
-        saldo: 0,
-        monto: 0,
-        cargo: 0,
-        metodopago,
+
+      id_ciudadano: ciudadano_id,
+
+      saldo: 0,
+
+      monto: 0,
+
+      cargo: 0,
+
+      metodopago,
     });
 
-    const guardado = await this.mpcRepository.save(nuevo);
+    const guardado =
+      await this.mpcRepository.save(nuevo);
+
     return [guardado];
+  }
 }
-
-}
-

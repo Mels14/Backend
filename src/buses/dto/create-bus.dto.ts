@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, MinLength } from "class-validator";
+import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min, MinLength } from "class-validator";
 
 export class CreateBusDto {
     @IsString()
@@ -29,8 +29,4 @@ export class CreateBusDto {
     @IsString()
     @IsOptional()
     fotoBus?: string;
-
-    @IsInt()
-    @IsNotEmpty()
-    empresaId!: number;
 }

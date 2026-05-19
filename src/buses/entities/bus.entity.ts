@@ -26,7 +26,7 @@ export class Bus {
     @Column()
     estado?: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'longtext', nullable: true })
     fotoBus?: string;
 
     @Column({ unique: true })

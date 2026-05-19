@@ -35,7 +35,7 @@ export class BusesService {
         return bus;
     }
 
-    async create(dto: CreateBusDto): Promise<Bus> {
+    async create(dto: CreateBusDto, empresaId: number): Promise<Bus> {
         const placaExiste = await this.busRepository.findOne({
             where: { placa: dto.placa },
         });
@@ -43,14 +43,12 @@ export class BusesService {
             throw new BadRequestException('Ya existe un bus con esa placa');
         }
 
-        const empresa = await this.empresasService.findOne(dto.empresaId);
+        const empresa = await this.empresasService.findOne(empresaId);
         const gps = await this.gpsService.crear();
         const codigoQR = 'BUS-QR-' + uuidv4().substring(0, 8).toUpperCase();
 
-        const { empresaId, ...datosBus } = dto;
-
         const bus = this.busRepository.create({
-            ...datosBus,
+            ...dto,
             codigoQR,
             empresa,
             gps,

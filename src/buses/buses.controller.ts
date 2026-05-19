@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { BusesService } from './buses.service';
 import { CreateBusDto } from './dto/create-bus.dto';
 import { UpdateBusDto } from './dto/update-bus.dto';
@@ -19,9 +19,16 @@ export class BusesController {
     }
 
     @Post()
-    create(@Body() dto: CreateBusDto) {
-        return this.busesService.create(dto);
+    create(
+        @Body() dto: CreateBusDto,
+        @Query('empresaId', ParseIntPipe) empresaId: number,
+    ) {
+        console.log('DTO recibido:', JSON.stringify({ ...dto, fotoBus: dto.fotoBus ? 'base64...' : null }));
+        console.log('empresaId:', empresaId);
+        return this.busesService.create(dto, empresaId);
     }
+
+    
 
     @Put(':id')
     update(

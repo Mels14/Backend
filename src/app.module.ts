@@ -5,17 +5,17 @@ import { APP_GUARD } from '@nestjs/core';
 import { RutasModule } from './rutas/rutas.module';
 import { ParaderosModule } from './paraderos/paraderos.module';
 import { BoletosModule } from './boletos/boletos.module';
+import { NodosModule } from './nodos/nodos.module';
 import { HistoriasModule } from './historias/historias.module';
 import { EmpresasModule } from './empresas/empresas.module';
-import { BusesModule } from './buses/buses.module';
 import { GpsModule } from './gps/gps.module';
 import { ProgramacionesModule } from './programaciones/programaciones.module';
 import { MetodospagoModule } from './metodospago/metodospago.module';
 import { MetodospagociudadanoModule } from './metodospagociudadano/metodospagociudadano.module';
 import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
-import { NodosModule } from './nodos/nodos.module';
 import { SecurityGuard } from './guards/security/security.guard';
+import { BusesModule } from './buses/buses.module';
 
 @Module({
   imports: [

@@ -102,9 +102,6 @@ export class TurnosService {
       );
     }
 
-    console.log('Turno encontrado:', turno);
-    console.log('GPS de momento:', turno.bus?.gps);
-
     // Validar que la fecha programada sea la de hoy (estricta)
     /*if (turno.fechaProgramada) {
       const fechaProgramada = new Date(turno.fechaProgramada);
@@ -129,6 +126,26 @@ export class TurnosService {
       }
     }
     */
+
+    if (turno.fechaProgramada) {
+      const fechaProgramada = new Date(turno.fechaProgramada);
+
+      // Diferencia en minutos
+      const diferenciaMinutos =
+        (ahora.getTime() - fechaProgramada.getTime()) / (1000 * 60);
+
+      console.log('Ahora:', ahora);
+      console.log('Programada:', fechaProgramada);
+      console.log('Diferencia:', diferenciaMinutos);
+
+      // Permitir iniciar 5 minutos antes o 5 minutos después
+      if (diferenciaMinutos < -5 || diferenciaMinutos > 5) {
+        throw new BadRequestException(
+          `El turno está programado para ${fechaProgramada.toLocaleString()}. ` +
+            `No puede iniciarse en este momento.`,
+        );
+      }
+    }
     // Guardar observaciones si vienen
     if (dto.observaciones) {
       turno.observaciones = dto.observaciones;
@@ -139,8 +156,6 @@ export class TurnosService {
     turno.fechaInicio = ahora;
 
     const turnoActualizado = await this.turnoRepository.save(turno);
-
-    console.log("TURNO ACTUALIZADO: ", turno)
 
     // Activar GPS del bus
     if (turno.bus?.gps?.id) {

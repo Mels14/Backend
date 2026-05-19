@@ -35,7 +35,6 @@ export class TurnosController {
         @Param('conductorId', ParseIntPipe) conductorId: number,
         @Body() dto: IniciarTurnoDto,
     ) {
-        console.log("ENTRÓ AL CONTROLLER");
         return this.turnosService.iniciarTurno(conductorId, dto);
     }
 

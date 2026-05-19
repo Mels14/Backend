@@ -1,10 +1,8 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { BoletosService } from './boletos.service';
 import { AbordajeDto } from './dto/abordaje.dto';
 import { DescensoDto } from './dto/descenso.dto';
-import { SecurityGuard } from '../guards/security.guard';
 
-@UseGuards(SecurityGuard)
 @Controller('boletos')
 export class BoletosController {
   constructor(private readonly boletosService: BoletosService) {}

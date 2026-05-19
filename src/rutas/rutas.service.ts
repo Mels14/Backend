@@ -14,8 +14,10 @@ export class RutasService {
     constructor(
         @InjectRepository(Ruta)
         private readonly rutaRepository: Repository<Ruta>,
+
         @InjectRepository(Nodo)
         private readonly nodoRepository: Repository<Nodo>,
+
         @InjectRepository(Paradero)
         private readonly paraderoRepository: Repository<Paradero>,
     ) {}
@@ -34,58 +36,100 @@ export class RutasService {
             relations: ['nodos', 'nodos.paradero'],
             order: { nodos: { orden: 'ASC' } },
         });
+
         if (!ruta) {
             throw new NotFoundException(`Ruta con id ${id} no encontrada`);
         }
+
         return ruta;
     }
 
+    async getParaderos(id: number) {
+        const ruta = await this.rutaRepository.findOne({
+            where: { id },
+            relations: ['nodos', 'nodos.paradero'],
+            order: {
+                nodos: {
+                    orden: 'ASC',
+                },
+            },
+        });
+
+        if (!ruta) {
+            throw new NotFoundException('Ruta no encontrada');
+        }
+
+        return ruta.nodos?.map((nodo) => nodo.paradero) || [];
+    }
+
     async create(dto: CreateRutaDto): Promise<Ruta> {
-        // Validar que no haya paraderos duplicados
+
+        // Validar paraderos duplicados
         const paraderoIds = dto.nodos.map(n => n.paraderoId);
         const paraderoIdsUnicos = new Set(paraderoIds);
+
         if (paraderoIds.length !== paraderoIdsUnicos.size) {
-            throw new BadRequestException('No puede haber paraderos duplicados en la ruta');
+            throw new BadRequestException(
+                'No puede haber paraderos duplicados en la ruta'
+            );
         }
 
-        // Validar que no haya órdenes duplicados
+        // Validar órdenes duplicados
         const ordenes = dto.nodos.map(n => n.orden);
         const ordenesUnicos = new Set(ordenes);
+
         if (ordenes.length !== ordenesUnicos.size) {
-            throw new BadRequestException('No puede haber órdenes duplicados en los nodos');
+            throw new BadRequestException(
+                'No puede haber órdenes duplicados en los nodos'
+            );
         }
 
-        // Validar que todos los paraderos existen
+        // Buscar paraderos
         const paraderos = await Promise.all(
             paraderoIds.map(async (pid) => {
-                const paradero = await this.paraderoRepository.findOne({ where: { id: pid } });
+
+                const paradero = await this.paraderoRepository.findOne({
+                    where: { id: pid }
+                });
+
                 if (!paradero) {
-                    throw new NotFoundException(`Paradero con id ${pid} no encontrado`);
+                    throw new NotFoundException(
+                        `Paradero con id ${pid} no encontrado`
+                    );
                 }
+
                 return paradero;
             })
         );
 
-        // Generar código único
-        const codigo = 'RUT-' + uuidv4().substring(0, 8).toUpperCase();
+        // Código automático
+        const codigo =
+            'RUT-' +
+            uuidv4().substring(0, 8).toUpperCase();
 
         // Crear ruta
         const ruta = this.rutaRepository.create({
             nombre: dto.nombre,
             descripcion: dto.descripcion,
             tarifa: dto.tarifa,
+            tiempo_estimado: dto.tiempo_estimado,
             codigo,
             activa: true,
         });
 
         const rutaGuardada = await this.rutaRepository.save(ruta);
 
-        // Crear nodos ordenados
+        // Crear nodos
         const nodos = dto.nodos.map((nodoDto, index) => {
+
             return this.nodoRepository.create({
                 orden: nodoDto.orden,
-                distanciaDesdeAnterior: nodoDto.distanciaDesdeAnterior,
-                tiempoEstimado: nodoDto.tiempoEstimado,
+                distanciaDesdeAnterior:
+                    nodoDto.distanciaDesdeAnterior,
+
+                tiempoEstimado:
+                    nodoDto.tiempoEstimado,
+
                 paradero: paraderos[index],
                 ruta: rutaGuardada,
             });
@@ -96,25 +140,42 @@ export class RutasService {
         return this.findOne(rutaGuardada.id!);
     }
 
-    async update(id: number, dto: UpdateRutaDto): Promise<Ruta> {
+    async update(
+        id: number,
+        dto: UpdateRutaDto,
+    ): Promise<Ruta> {
+
         const ruta = await this.findOne(id);
+
         Object.assign(ruta, dto);
+
         return this.rutaRepository.save(ruta);
     }
 
     async remove(id: number): Promise<{ mensaje: string }> {
+
         const ruta = await this.findOne(id);
+
         ruta.activa = false;
+
         await this.rutaRepository.save(ruta);
-        return { mensaje: 'Ruta desactivada correctamente' };
+
+        return {
+            mensaje: 'Ruta desactivada correctamente'
+        };
     }
 
-    // Calcular tiempo total estimado de la ruta
-    async tiempoTotal(id: number): Promise<{ tiempoTotal: number; unidad: string }> {
+    // Tiempo total de ruta
+    async tiempoTotal(
+        id: number
+    ): Promise<{ tiempoTotal: number; unidad: string }> {
+
         const ruta = await this.findOne(id);
-        const tiempoTotal = ruta.nodos?.reduce((acc, nodo) => {
-            return acc + (nodo.tiempoEstimado || 0);
-        }, 0) || 0;
+
+        const tiempoTotal =
+            ruta.nodos?.reduce((acc, nodo) => {
+                return acc + (nodo.tiempoEstimado || 0);
+            }, 0) || 0;
 
         return {
             tiempoTotal,

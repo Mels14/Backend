@@ -12,6 +12,7 @@ import { IniciarTurnoDto } from './dto/iniciar-turno.dto';
 import { BusesService } from '../buses/buses.service';
 import { ConductoresService } from '../conductores/conductores.service';
 import { GpsService } from '../gps/gps.service';
+import { In } from 'typeorm';
 
 @Injectable()
 export class TurnosService {
@@ -188,16 +189,16 @@ export class TurnosService {
   }
 
   async validarConductorActivoPorBus(
-    busId: number,
-    fecha: Date,
+      busId: number,
+      fecha: Date,
   ): Promise<boolean> {
-    const turno = await this.turnoRepository.findOne({
-      where: {
-        bus: { id: busId },
-        estado: 'en_curso',
-      },
-      relations: ['conductor', 'bus'],
-    });
-    return !!turno;
+      const turno = await this.turnoRepository.findOne({
+          where: {
+              bus: { id: busId },
+              estado: In(['en_curso', 'programado']),
+          },
+          relations: ['conductor', 'bus'],
+      });
+      return !!turno;
   }
 }

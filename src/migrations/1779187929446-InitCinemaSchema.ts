@@ -1,9 +1,12 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitCinemaSchema1779179678374 implements MigrationInterface {
-    name = 'InitCinemaSchema1779179678374'
+export class InitCinemaSchema1779187929446 implements MigrationInterface {
+    name = 'InitCinemaSchema1779187929446'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE \`metodospago\` (\`id\` int NOT NULL AUTO_INCREMENT, \`tipo\` varchar(255) NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`metodospagociudadano\` (\`id\` int NOT NULL AUTO_INCREMENT, \`id_ciudadano\` varchar(255) NOT NULL, \`saldo\` int NOT NULL, \`monto\` int NOT NULL, \`cargo\` int NOT NULL, \`metodopago_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`transacciones\` (\`id\` int NOT NULL AUTO_INCREMENT, \`referencia\` varchar(255) NOT NULL, \`monto\` int NOT NULL, \`fecha\` datetime NOT NULL, \`estado\` varchar(255) NOT NULL, \`metodopagociudadanoId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`personas\` (\`id\` int NOT NULL AUTO_INCREMENT, \`nombre\` varchar(255) NOT NULL, \`apellido\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`telefono\` varchar(255) NULL, UNIQUE INDEX \`IDX_6019651944f62d09f56ff66f60\` (\`email\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`conductores\` (\`id\` int NOT NULL AUTO_INCREMENT, \`licencia\` varchar(255) NOT NULL, \`persona_id\` int NULL, UNIQUE INDEX \`IDX_a01e7172ea361195be58ab5962\` (\`licencia\`), UNIQUE INDEX \`REL_bc0266d66cf1bb0692fe14a01c\` (\`persona_id\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`empresas\` (\`id\` int NOT NULL AUTO_INCREMENT, \`nombre\` varchar(255) NOT NULL, \`nit\` varchar(255) NOT NULL, \`telefono\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`activa\` tinyint NOT NULL DEFAULT 1, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -18,15 +21,15 @@ export class InitCinemaSchema1779179678374 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`comentarios_incidente\` (\`id\` int NOT NULL AUTO_INCREMENT, \`contenido\` text NOT NULL, \`autor\` varchar(255) NOT NULL, \`fecha\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`incidente_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`incidentes\` (\`id\` int NOT NULL AUTO_INCREMENT, \`tipo\` enum ('accidente_menor', 'falla_mecanica', 'congestion_inesperada', 'problema_pasajeros') NOT NULL, \`gravedad\` enum ('bajo', 'medio', 'alto', 'critico') NOT NULL, \`estado\` enum ('pendiente', 'en_revision', 'resuelto') NOT NULL DEFAULT 'pendiente', \`descripcion\` text NOT NULL, \`notificadoSupervisor\` tinyint NOT NULL DEFAULT 0, \`fecha\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`bus_id\` int NULL, \`conductor_id\` int NULL, \`turno_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`turnos\` (\`id\` int NOT NULL AUTO_INCREMENT, \`fechaProgramada\` datetime NULL, \`fechaInicio\` datetime NULL, \`fechaFin\` datetime NULL, \`estado\` enum ('programado', 'en_curso', 'finalizado') NOT NULL DEFAULT 'programado', \`observaciones\` text NULL, \`conductor_id\` int NULL, \`bus_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`metodospago\` (\`id\` int NOT NULL AUTO_INCREMENT, \`tipo\` varchar(255) NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`metodospagociudadano\` (\`id\` int NOT NULL AUTO_INCREMENT, \`id_ciudadano\` varchar(255) NOT NULL, \`saldo\` int NOT NULL, \`monto\` int NOT NULL, \`cargo\` int NOT NULL, \`metodopago_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`transacciones\` (\`id\` int NOT NULL AUTO_INCREMENT, \`referencia\` varchar(255) NOT NULL, \`monto\` int NOT NULL, \`fecha\` datetime NOT NULL, \`estado\` varchar(255) NOT NULL, \`metodopagociudadanoId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`ALTER TABLE \`metodospagociudadano\` ADD CONSTRAINT \`FK_c77f59278175e2a146dd4f24325\` FOREIGN KEY (\`metodopago_id\`) REFERENCES \`metodospago\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`transacciones\` ADD CONSTRAINT \`FK_14eaf29780b39bd6fc2c76a09ed\` FOREIGN KEY (\`metodopagociudadanoId\`) REFERENCES \`metodospagociudadano\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`conductores\` ADD CONSTRAINT \`FK_bc0266d66cf1bb0692fe14a01c6\` FOREIGN KEY (\`persona_id\`) REFERENCES \`personas\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`nodos\` ADD CONSTRAINT \`FK_1db8f2a7fbf11fb7562736c37df\` FOREIGN KEY (\`ruta_id\`) REFERENCES \`rutas\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`nodos\` ADD CONSTRAINT \`FK_d0025d67eea6a1b5e32826b9f2c\` FOREIGN KEY (\`paradero_id\`) REFERENCES \`paraderos\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`boletos\` ADD CONSTRAINT \`FK_365ae3b69628ff0f5c5e24618e0\` FOREIGN KEY (\`programacion_id\`) REFERENCES \`programaciones\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`boletos\` ADD CONSTRAINT \`FK_d2a2fe9d49e3513d9b2d29b938f\` FOREIGN KEY (\`paradero_abordaje_id\`) REFERENCES \`paraderos\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`boletos\` ADD CONSTRAINT \`FK_9ec25d3123e49c5f2b74c7f68ad\` FOREIGN KEY (\`paradero_descenso_id\`) REFERENCES \`paraderos\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`programaciones\` ADD CONSTRAINT \`FK_bd89e2d3e415b5de3c009b2ec66\` FOREIGN KEY (\`conductor_id\`) REFERENCES \`conductores\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`programaciones\` ADD CONSTRAINT \`FK_84ff5ccccc8d03befac42644d23\` FOREIGN KEY (\`ruta_id\`) REFERENCES \`rutas\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`programaciones\` ADD CONSTRAINT \`FK_268023a8b8d040f970ef1183716\` FOREIGN KEY (\`bus_id\`) REFERENCES \`buses\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`buses\` ADD CONSTRAINT \`FK_45fbb665b161ccb9b63acb9904c\` FOREIGN KEY (\`empresa_id\`) REFERENCES \`empresas\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -38,13 +41,9 @@ export class InitCinemaSchema1779179678374 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`incidentes\` ADD CONSTRAINT \`FK_f0f01dd4e8696bc2e27b9043d4b\` FOREIGN KEY (\`turno_id\`) REFERENCES \`turnos\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`turnos\` ADD CONSTRAINT \`FK_3db03ec6ba62996743b23a24b7e\` FOREIGN KEY (\`conductor_id\`) REFERENCES \`conductores\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`turnos\` ADD CONSTRAINT \`FK_321cdd32b08af8ecab080d49f04\` FOREIGN KEY (\`bus_id\`) REFERENCES \`buses\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`metodospagociudadano\` ADD CONSTRAINT \`FK_c77f59278175e2a146dd4f24325\` FOREIGN KEY (\`metodopago_id\`) REFERENCES \`metodospago\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`transacciones\` ADD CONSTRAINT \`FK_14eaf29780b39bd6fc2c76a09ed\` FOREIGN KEY (\`metodopagociudadanoId\`) REFERENCES \`metodospagociudadano\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`transacciones\` DROP FOREIGN KEY \`FK_14eaf29780b39bd6fc2c76a09ed\``);
-        await queryRunner.query(`ALTER TABLE \`metodospagociudadano\` DROP FOREIGN KEY \`FK_c77f59278175e2a146dd4f24325\``);
         await queryRunner.query(`ALTER TABLE \`turnos\` DROP FOREIGN KEY \`FK_321cdd32b08af8ecab080d49f04\``);
         await queryRunner.query(`ALTER TABLE \`turnos\` DROP FOREIGN KEY \`FK_3db03ec6ba62996743b23a24b7e\``);
         await queryRunner.query(`ALTER TABLE \`incidentes\` DROP FOREIGN KEY \`FK_f0f01dd4e8696bc2e27b9043d4b\``);
@@ -56,15 +55,15 @@ export class InitCinemaSchema1779179678374 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`buses\` DROP FOREIGN KEY \`FK_45fbb665b161ccb9b63acb9904c\``);
         await queryRunner.query(`ALTER TABLE \`programaciones\` DROP FOREIGN KEY \`FK_268023a8b8d040f970ef1183716\``);
         await queryRunner.query(`ALTER TABLE \`programaciones\` DROP FOREIGN KEY \`FK_84ff5ccccc8d03befac42644d23\``);
+        await queryRunner.query(`ALTER TABLE \`programaciones\` DROP FOREIGN KEY \`FK_bd89e2d3e415b5de3c009b2ec66\``);
         await queryRunner.query(`ALTER TABLE \`boletos\` DROP FOREIGN KEY \`FK_9ec25d3123e49c5f2b74c7f68ad\``);
         await queryRunner.query(`ALTER TABLE \`boletos\` DROP FOREIGN KEY \`FK_d2a2fe9d49e3513d9b2d29b938f\``);
         await queryRunner.query(`ALTER TABLE \`boletos\` DROP FOREIGN KEY \`FK_365ae3b69628ff0f5c5e24618e0\``);
         await queryRunner.query(`ALTER TABLE \`nodos\` DROP FOREIGN KEY \`FK_d0025d67eea6a1b5e32826b9f2c\``);
         await queryRunner.query(`ALTER TABLE \`nodos\` DROP FOREIGN KEY \`FK_1db8f2a7fbf11fb7562736c37df\``);
         await queryRunner.query(`ALTER TABLE \`conductores\` DROP FOREIGN KEY \`FK_bc0266d66cf1bb0692fe14a01c6\``);
-        await queryRunner.query(`DROP TABLE \`transacciones\``);
-        await queryRunner.query(`DROP TABLE \`metodospagociudadano\``);
-        await queryRunner.query(`DROP TABLE \`metodospago\``);
+        await queryRunner.query(`ALTER TABLE \`transacciones\` DROP FOREIGN KEY \`FK_14eaf29780b39bd6fc2c76a09ed\``);
+        await queryRunner.query(`ALTER TABLE \`metodospagociudadano\` DROP FOREIGN KEY \`FK_c77f59278175e2a146dd4f24325\``);
         await queryRunner.query(`DROP TABLE \`turnos\``);
         await queryRunner.query(`DROP TABLE \`incidentes\``);
         await queryRunner.query(`DROP TABLE \`comentarios_incidente\``);
@@ -86,6 +85,9 @@ export class InitCinemaSchema1779179678374 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`conductores\``);
         await queryRunner.query(`DROP INDEX \`IDX_6019651944f62d09f56ff66f60\` ON \`personas\``);
         await queryRunner.query(`DROP TABLE \`personas\``);
+        await queryRunner.query(`DROP TABLE \`transacciones\``);
+        await queryRunner.query(`DROP TABLE \`metodospagociudadano\``);
+        await queryRunner.query(`DROP TABLE \`metodospago\``);
     }
 
 }

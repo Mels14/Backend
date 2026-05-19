@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { RutasModule } from './rutas/rutas.module';
 import { ParaderosModule } from './paraderos/paraderos.module';
 import { BoletosModule } from './boletos/boletos.module';
@@ -14,6 +15,7 @@ import { MetodospagociudadanoModule } from './metodospagociudadano/metodospagoci
 import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { NodosModule } from './nodos/nodos.module';
+import { SecurityGuard } from './guards/security/security.guard';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { NodosModule } from './nodos/nodos.module';
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false, // Usaremos migraciones
+        synchronize: false,
       }),
     }),
     RutasModule,
@@ -45,6 +47,12 @@ import { NodosModule } from './nodos/nodos.module';
     MetodospagociudadanoModule,
     ReportesModule,
     TransaccionesModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: SecurityGuard,
+    },
   ],
 })
 export class AppModule {}

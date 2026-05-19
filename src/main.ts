@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { SecurityGuard } from './guards/security.guard';
+import { SecurityGuard } from './guards/security/security.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

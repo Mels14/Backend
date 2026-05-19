@@ -1,10 +1,8 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, ParseIntPipe,  } from '@nestjs/common';
 import { ParaderosService } from './paraderos.service';
 import { CreateParaderoDto } from './dto/create-paradero.dto';
 import { CercanosDto } from './dto/cercanos.dto';
-import { SecurityGuard } from '../guards/security.guard';
 
-@UseGuards(SecurityGuard)
 @Controller('paraderos')
 export class ParaderosController {
   constructor(private readonly paraderosService: ParaderosService) {}

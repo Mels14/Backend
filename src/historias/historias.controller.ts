@@ -1,8 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { HistoriasService } from './historias.service';
-import { SecurityGuard } from '../guards/security.guard';
 
-@UseGuards(SecurityGuard)
+
 @Controller('historias')
 export class HistoriasController {
   constructor(private readonly historiasService: HistoriasService) {}

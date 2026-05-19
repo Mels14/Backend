@@ -1,20 +1,24 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsNumber, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Type } from 'class-transformer';
 
 export class CreateParaderoDto {
-    @IsString()
-    @IsNotEmpty()
-    nombre?: string;
+  @IsString()
+  @IsNotEmpty()
+  nombre!: string;
 
-    @IsInt()
-    @IsNotEmpty()
-    latitud?: number;
+  @IsNumber()
+  @Type(() => Number)
+  latitud!: number;
 
-    @IsInt()
-    @IsNotEmpty()
-    longitud?: number;
+  @IsNumber()
+  @Type(() => Number)
+  longitud!: number;
 
-    @IsString()
-    @IsNotEmpty()
-    clasificacion?: string;
+  @IsString()
+  @IsOptional()
+  descripcion?: string;
 
+  @IsString()
+  @IsOptional()
+  clasificacion?: string;
 }

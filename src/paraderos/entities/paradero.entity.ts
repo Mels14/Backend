@@ -1,25 +1,26 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Nodo } from '../../nodos/entities/nodo.entity';
 
-
 @Entity('paraderos')
 export class Paradero {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column()
-    nombre?: string;
+  @Column()
+  nombre?: string;
 
-    @Column()
-    latitud?: number;
+  @Column('decimal', { precision: 10, scale: 8 })
+  latitud?: number;
 
-    @Column()
-    longitud?: number;
+  @Column('decimal', { precision: 11, scale: 8 })
+  longitud?: number;
 
-    @Column()
-    clasificacion?: string;
+  @Column({ nullable: true })  // ← nullable
+  clasificacion?: string;
 
-    @OneToMany(()=> Nodo, (nodo)=> nodo.ruta)
-    nodos?: Nodo[];
+  @Column({ nullable: true })  // ← agregar descripcion
+  descripcion?: string;
 
+  @OneToMany(() => Nodo, (nodo) => nodo.paradero)  // ← era nodo.ruta, debe ser nodo.paradero
+  nodos?: Nodo[];
 }

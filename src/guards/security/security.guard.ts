@@ -7,28 +7,30 @@ export class SecurityGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { headers } = request;
+    const { headers, url, method } = request;
+
+    if (url === '/programaciones/horarios-rutas' && method === 'GET') {
+      return true;
+    }
 
     if (!headers.authorization) {
       throw new UnauthorizedException('Token de autorización faltante');
     }
 
-    return true;
+    const token = headers.authorization.replace('Bearer ', '');
+    const permissionData = { url, method };
 
-    // TODO: activar cuando permissions-validation funcione
-    // const { url, method } = request;
-    // const token = headers.authorization.replace('Bearer ', '');
-    // const permissionData = { url, method };
-    // try {
-    //   const securityUrl = `${process.env.MS_SECURITY}/api/public/security/permissions-validation`;
-    //   const response = await axios.post(securityUrl, permissionData, {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   });
-    //   if (response.data === true) return true;
-    //   else throw new UnauthorizedException('Permisos insuficientes');
-    // } catch(error: any) {
-    //   this.logger.error(`Error al validar permisos: ${error.message}`);
-    //   throw new UnauthorizedException('Error al validar permisos');
-    // }
+    try {
+      const securityUrl = `${process.env.MS_SECURITY}/security/permissions-validation`;
+      const response = await axios.post(securityUrl, permissionData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data === true) return true;
+      else throw new UnauthorizedException('Permisos insuficientes');
+    } catch(error: any) {
+      this.logger.error(`Error al validar permisos: ${error.message}`);
+      throw new UnauthorizedException('Error al validar permisos');
+    }
   }
 }

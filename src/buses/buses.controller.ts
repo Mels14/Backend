@@ -19,13 +19,18 @@ export class BusesController {
     }
 
     @Post()
-    create(
+    async create(
         @Body() dto: CreateBusDto,
         @Query('empresaId', ParseIntPipe) empresaId: number,
     ) {
         console.log('DTO recibido:', JSON.stringify({ ...dto, fotoBus: dto.fotoBus ? 'base64...' : null }));
         console.log('empresaId:', empresaId);
-        return this.busesService.create(dto, empresaId);
+        try {
+            return await this.busesService.create(dto, empresaId);
+        } catch(error) {
+            console.error('Error creando bus:', error);
+            throw error;
+        }
     }
 
     

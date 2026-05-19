@@ -8,13 +8,24 @@ export class ProgramacionesController {
   constructor(private readonly programacionesService: ProgramacionesService) {}
 
   @Post()
-  create(@Body() createProgramacioneDto: CreateProgramacionDto) {
-    return this.programacionesService.create(createProgramacioneDto);
+  async create(@Body() createProgramacioneDto: CreateProgramacionDto) {
+      console.log('DTO recibido:', JSON.stringify(createProgramacioneDto));
+      try {
+          return await this.programacionesService.create(createProgramacioneDto);
+      } catch(error) {
+          console.error('Error creando programacion:', error.message);
+          throw error;
+      }
   }
 
   @Get()
   findAll() {
     return this.programacionesService.findAll();
+  }
+
+    @Get('horarios-rutas')
+  findHorario() {
+      return this.programacionesService.findAll();
   }
 
   @Get(':id')
@@ -31,4 +42,5 @@ export class ProgramacionesController {
   remove(@Param('id') id: string) {
     return this.programacionesService.remove(+id);
   }
+  
 }

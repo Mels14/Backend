@@ -16,6 +16,9 @@ import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { SecurityGuard } from './guards/security/security.guard';
 import { BusesModule } from './buses/buses.module';
+import { GruposModule } from './grupos/grupos.module';
+import { MensajesModule } from './mensajes/mensajes.module';
+import { MensajeriaModule } from './mensajeria/mensajeria.module';
 
 @Module({
   imports: [
@@ -47,6 +50,12 @@ import { BusesModule } from './buses/buses.module';
     MetodospagociudadanoModule,
     ReportesModule,
     TransaccionesModule,
+    GruposModule,
+    MensajesModule,
+    MensajeriaModule,
+    MensajeriaModule,
+    MensajesModule,
+    GruposModule,
   ],
   providers: [
     {

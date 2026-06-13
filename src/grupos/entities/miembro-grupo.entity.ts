@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { Grupo } from './grupo.entity';
 
 @Entity('miembros_grupo')
@@ -21,9 +22,18 @@ export class MiembroGrupo {
   @CreateDateColumn()
   unidoEn?: Date;
 
-  @Column({ nullable: true, type: 'datetime' })
+  @Column({
+    nullable: true,
+    type: 'datetime',
+  })
   bloqueadoEn?: Date | null;
 
-  @ManyToOne(() => Grupo, (g) => g.miembros, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => Grupo,
+    (g) => g.miembrosGrupo,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   grupo?: Grupo;
 }

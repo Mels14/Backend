@@ -1,8 +1,17 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateGrupoDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
   @MaxLength(100)
   nombre!: string;
 
@@ -12,6 +21,18 @@ export class CreateGrupoDto {
   descripcion?: string;
 
   @IsOptional()
-  @IsEnum(['PUBLIC', 'PRIVATE'])
-  tipo?: 'PUBLIC' | 'PRIVATE';
+  @IsString()
+  imagen?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['publico', 'privado', 'PUBLIC', 'PRIVATE'])
+  tipo?: string;
+
+  @IsOptional()
+  @IsArray()
+  miembros?: {
+    userId: string;
+    nombre: string;
+  }[];
 }

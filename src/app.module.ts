@@ -16,11 +16,23 @@ import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { SecurityGuard } from './guards/security/security.guard';
 import { BusesModule } from './buses/buses.module';
+<<<<<<< HEAD
 import { MonitoreoModule } from './monitoreo/monitoreo.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GruposModule } from './grupos/grupos.module';
 import { PqrsModule } from './pqrs/pqrs.module';
 import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima.module';
+=======
+import { GruposModule } from './grupos/grupos.module';
+import { MensajesModule } from './mensajes/mensajes.module';
+import { MensajeriaModule } from './mensajeria/mensajeria.module';
+
+import { MonitoreoModule } from './monitoreo/monitoreo.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { PqrsModule } from './pqrs/pqrs.module';
+import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima.module';
+
+>>>>>>> e465fc314748f4171e0fccd0478759735ae0d494
 
 @Module({
   imports: [
@@ -54,6 +66,11 @@ import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima
     MetodospagociudadanoModule,
     ReportesModule,
     TransaccionesModule,
+    GruposModule,
+    MensajesModule,
+    MensajeriaModule,
+    MensajeriaModule,
+    MensajesModule,
     GruposModule,
     PqrsModule,
     PreferenciasClimaModule,

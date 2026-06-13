@@ -16,10 +16,14 @@ import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { SecurityGuard } from './guards/security/security.guard';
 import { BusesModule } from './buses/buses.module';
+import { MonitoreoModule } from './monitoreo/monitoreo.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -35,6 +39,8 @@ import { BusesModule } from './buses/buses.module';
       }),
     }),
     RutasModule,
+    MonitoreoModule,
+    ScheduleModule,
     ParaderosModule,
     BoletosModule,
     NodosModule,

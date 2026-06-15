@@ -21,21 +21,22 @@ export class MensajeriaGateway implements OnGatewayConnection, OnGatewayDisconne
 
     private readonly logger = new Logger('MensajeriaGateway');
 
-    // Mapa de userId → socketId para saber quién está conectado
-    private usuariosConectados = new Map<string, string>();
+    // userId → Socket completo (necesario para excluir al emisor en grupos)
+    private usuariosConectados = new Map<string, Socket>();
 
     handleConnection(client: Socket) {
         const userId = client.handshake.query.userId as string;
         if (userId) {
-            this.usuariosConectados.set(userId, client.id);
+            this.usuariosConectados.set(userId, client);
+            // Avisar al cliente que el socket está listo para emitir eventos
+            client.emit('conexion_lista', { userId });
             this.logger.log(`Usuario conectado: ${userId} → socket ${client.id}`);
         }
     }
 
     handleDisconnect(client: Socket) {
-        // Eliminar usuario del mapa al desconectarse
-        for (const [userId, socketId] of this.usuariosConectados.entries()) {
-            if (socketId === client.id) {
+        for (const [userId, socket] of this.usuariosConectados.entries()) {
+            if (socket.id === client.id) {
                 this.usuariosConectados.delete(userId);
                 this.logger.log(`Usuario desconectado: ${userId}`);
                 break;
@@ -43,7 +44,6 @@ export class MensajeriaGateway implements OnGatewayConnection, OnGatewayDisconne
         }
     }
 
-    // Unirse a la sala de un grupo
     @SubscribeMessage('unirse_grupo')
     handleUnirseGrupo(
         @ConnectedSocket() client: Socket,
@@ -54,7 +54,6 @@ export class MensajeriaGateway implements OnGatewayConnection, OnGatewayDisconne
         this.logger.log(`Cliente ${client.id} unido a sala ${room}`);
     }
 
-    // Salir de la sala de un grupo
     @SubscribeMessage('salir_grupo')
     handleSalirGrupo(
         @ConnectedSocket() client: Socket,
@@ -65,35 +64,48 @@ export class MensajeriaGateway implements OnGatewayConnection, OnGatewayDisconne
         this.logger.log(`Cliente ${client.id} salió de sala ${room}`);
     }
 
-    // Enviar mensaje directo a un usuario específico
+    // Mensaje directo: solo al destinatario, nunca al emisor
     enviarMensajeDirecto(destinatarioId: string, mensaje: any) {
-        const socketId = this.usuariosConectados.get(destinatarioId);
-        if (socketId) {
-            this.server.to(socketId).emit('mensaje_directo', mensaje);
+        const socket = this.usuariosConectados.get(destinatarioId);
+        if (socket) {
+            socket.emit('mensaje_directo', mensaje);
             this.logger.log(`Mensaje directo enviado a ${destinatarioId}`);
         } else {
             this.logger.log(`Usuario ${destinatarioId} no está conectado`);
         }
     }
 
-    // Enviar mensaje a todos los miembros de un grupo
-    enviarMensajeGrupo(grupoId: number, mensaje: any) {
+    // Mensaje de grupo: emite a toda la sala EXCEPTO al emisor
+    // Así el emisor no recibe su propio mensaje por socket y no hay duplicados
+    enviarMensajeGrupo(grupoId: number, emisorId: string, mensaje: any) {
         const room = `grupo_${grupoId}`;
-        this.server.to(room).emit('mensaje_grupo', mensaje);
-        this.logger.log(`Mensaje enviado al grupo ${grupoId}`);
+        const socketEmisor = this.usuariosConectados.get(emisorId);
+        if (socketEmisor) {
+            // broadcast desde el socket del emisor → excluye al emisor automáticamente
+            socketEmisor.to(room).emit('mensaje_grupo', mensaje);
+        } else {
+            // Emisor no conectado → emitir a todos en la sala
+            this.server.to(room).emit('mensaje_grupo', mensaje);
+        }
+        this.logger.log(`Mensaje de grupo ${grupoId} enviado (emisor ${emisorId} excluido)`);
     }
 
-    // Enviar alerta masiva a todos los conectados
+    // Alerta masiva: a todos los conectados
     enviarAlertaMasiva(alerta: any) {
         this.server.emit('alerta_masiva', alerta);
         this.logger.log(`Alerta masiva enviada a todos`);
     }
 
-    // Notificar que un mensaje fue leído
+    // Notificar al emisor que su mensaje fue leído → activa ✓✓ en el frontend
     notificarMensajeLeido(emisorId: string, mensajeId: number) {
-        const socketId = this.usuariosConectados.get(emisorId);
-        if (socketId) {
-            this.server.to(socketId).emit('mensaje_leido', { mensajeId });
+        const socket = this.usuariosConectados.get(emisorId);
+        if (socket) {
+            socket.emit('mensaje_leido', { mensajeId });
+            this.logger.log(`Mensaje ${mensajeId} marcado como leído, notificado a ${emisorId}`);
         }
     }
+
+    getUsuariosConectados(): number {
+    return this.usuariosConectados.size;
+}
 }

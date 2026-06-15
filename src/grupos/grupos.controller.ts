@@ -94,13 +94,24 @@ export class GruposController {
 
   @Post(':id/join')
   unirse(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req: any,
+      @Param('id', ParseIntPipe) id: number,
+      @Req() req: any,
   ) {
-    return this.gruposService.unirse(
-      id,
-      getUserId(req),
-    );
+      const auth = req.headers?.authorization ?? '';
+      const token = auth.replace('Bearer ', '');
+      let nombre = 'Usuario';
+      try {
+          const payload = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64').toString('utf8'),
+          );
+          nombre = payload.name ?? payload.nombre ?? payload.email ?? 'Usuario';
+      } catch {}
+
+      return this.gruposService.unirse(
+          id,
+          getUserId(req),
+          nombre,
+      );
   }
 
   @Delete(':id/leave')

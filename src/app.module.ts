@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { RutasModule } from './rutas/rutas.module';
 import { ParaderosModule } from './paraderos/paraderos.module';
 import { BoletosModule } from './boletos/boletos.module';
@@ -16,23 +17,12 @@ import { ReportesModule } from './reportes/reportes.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { SecurityGuard } from './guards/security/security.guard';
 import { BusesModule } from './buses/buses.module';
-<<<<<<< HEAD
 import { MonitoreoModule } from './monitoreo/monitoreo.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { GruposModule } from './grupos/grupos.module';
+import { MensajesModule } from './mensajes/mensajes.module';       // ← faltaba
+import { MensajeriaModule } from './mensajeria/mensajeria.module'; // ← faltaba
 import { PqrsModule } from './pqrs/pqrs.module';
 import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima.module';
-=======
-import { GruposModule } from './grupos/grupos.module';
-import { MensajesModule } from './mensajes/mensajes.module';
-import { MensajeriaModule } from './mensajeria/mensajeria.module';
-
-import { MonitoreoModule } from './monitoreo/monitoreo.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { PqrsModule } from './pqrs/pqrs.module';
-import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima.module';
-
->>>>>>> e465fc314748f4171e0fccd0478759735ae0d494
 
 @Module({
   imports: [
@@ -67,11 +57,8 @@ import { PreferenciasClimaModule } from './preferencias-clima/preferencias-clima
     ReportesModule,
     TransaccionesModule,
     GruposModule,
-    MensajesModule,
-    MensajeriaModule,
-    MensajeriaModule,
-    MensajesModule,
-    GruposModule,
+    MensajesModule,       // ← agregar
+    MensajeriaModule,     // ← agregar
     PqrsModule,
     PreferenciasClimaModule,
   ],

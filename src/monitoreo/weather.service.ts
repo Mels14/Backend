@@ -3,7 +3,7 @@ import axios from 'axios';
 
 @Injectable()
 export class WeatherService {
-  private readonly apiKey = 'TU_API_KEY_DE_OPENWEATHERMAP'; // regístrate para obtener una gratuita
+  private readonly apiKey = process.env.OPENWEATHER_API_KEY ?? '';
   private readonly baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
   async obtenerPronostico(ciudad: string) {

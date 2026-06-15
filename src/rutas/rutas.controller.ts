@@ -14,16 +14,26 @@ import { RutasService } from './rutas.service';
 import { CreateRutaDto } from './dto/create-ruta.dto';
 import { UpdateRutaDto } from './dto/update-ruta.dto';
 import { MonitoreoService } from '../monitoreo/monitoreo.service';
+
 @Controller('rutas')
 export class RutasController {
   constructor(
-  private readonly rutasService: RutasService,
-  private readonly monitoreoService: MonitoreoService, // ← agregar
-) {}
+    private readonly rutasService: RutasService,
+    private readonly monitoreoService: MonitoreoService,
+  ) {}
 
   @Get()
   findAll() {
     return this.rutasService.findAll();
+  }
+
+  @Get('estimar-llegada/:rutaId/:paraderoId')
+  async estimarLlegada(
+    @Param('rutaId', ParseIntPipe) rutaId: number,
+    @Param('paraderoId', ParseIntPipe) paraderoId: number,
+    @Query('busId') busId?: number,
+  ) {
+    return this.monitoreoService.estimarLlegada(rutaId, paraderoId, busId);
   }
 
   @Get(':id')
@@ -31,7 +41,6 @@ export class RutasController {
     return this.rutasService.findOne(id);
   }
 
-  // NUEVO ENDPOINT
   @Get(':id/paraderos')
   getParaderos(@Param('id', ParseIntPipe) id: number) {
     return this.rutasService.getParaderos(id);
@@ -43,17 +52,10 @@ export class RutasController {
   }
 
   @Get(':id/buses-activos')
-async getBusesActivos(@Param('id', ParseIntPipe) id: number) {
-  return this.monitoreoService.getBusesActivosPorRuta(id);
-}
-@Get('estimar-llegada/:rutaId/:paraderoId')
-async estimarLlegada(
-  @Param('rutaId', ParseIntPipe) rutaId: number,
-  @Param('paraderoId', ParseIntPipe) paraderoId: number,
-  @Query('busId') busId?: number,
-) {
-  return this.monitoreoService.estimarLlegada(rutaId, paraderoId, busId);
-}
+  async getBusesActivos(@Param('id', ParseIntPipe) id: number) {
+    return this.monitoreoService.getBusesActivosPorRuta(id);
+  }
+
   @Post()
   create(@Body() dto: CreateRutaDto) {
     return this.rutasService.create(dto);

@@ -18,4 +18,10 @@ export class DestinatarioPersona {
     @ManyToOne(() => Mensaje, (mensaje) => mensaje.destinatariosPersona, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'mensaje_id' })
     mensaje!: Mensaje;
+
+    @Column({ nullable: true })
+    interlocutorId?: string;
+
+    @Column({ nullable: true })
+    interlocutorNombre?: string;
 }

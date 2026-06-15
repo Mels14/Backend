@@ -5,10 +5,11 @@ import { GrupoPersona } from './entities/grupo-persona.entity';
 import { GruposService } from './grupos.service';
 import { GruposController } from './grupos.controller';
 import { MensajeriaModule } from '../mensajeria/mensajeria.module';
+import { MiembroGrupo } from './entities/miembro-grupo.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Grupo, GrupoPersona]),
+        TypeOrmModule.forFeature([Grupo, GrupoPersona, MiembroGrupo]),
         MensajeriaModule,
     ],
     controllers: [GruposController],

@@ -45,6 +45,16 @@ export class MonitoreoController {
     return this.monitoreoService.getPasajerosEnTransito();
   }
 
+  @Get('alertas-ocupacion')
+  getAlertasOcupacion() {
+    return this.monitoreoService.getAlertasOcupacionMaxima();
+  }
+
+  @Get('incidentes-activos')
+  getIncidentesActivos() {
+    return this.monitoreoService.getIncidentesActivos();
+  }
+
   // ✅ Endpoint que faltaba — causaba el 404 en SeguimientoRuta.tsx
   @Get('estimar-llegada/:rutaId/:paraderoId')
   estimarLlegada(

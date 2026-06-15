@@ -22,6 +22,9 @@ export class Mensaje {
     @Column({ default: false })
     esUrgente?: boolean;
 
+    @Column({ nullable: true })
+    ubicacion?: string; // JSON string: { lat, lng, direccion }
+
     @CreateDateColumn()
     fechaEnvio?: Date;
 

@@ -212,7 +212,7 @@ async moverBusesYNotificar() {
       ocupacion: p.ocupacion_actual,
       capacidad: p.capacidad_maxima,
       ruta: p.ruta?.nombre,
-      incidentesActivos: 0,
+      //incidentesActivos: 0,
     }));
   }
 
@@ -247,7 +247,7 @@ async moverBusesYNotificar() {
       }));
   }
 
-  @Cron('*/10 * * * * *')
+  @Cron('*/30 * * * * *')
   async emitirDatosPanel() {
     const estado = await this.getEstadoFlota();
     const pasajeros = await this.getPasajerosEnTransito();

@@ -13,4 +13,8 @@ export class CreateMensajeDirectoDto {
     @IsString()
     @IsNotEmpty()
     destinatarioNombre!: string;
+
+    @IsOptional()
+    @IsString()
+    ubicacion?: string;
 }

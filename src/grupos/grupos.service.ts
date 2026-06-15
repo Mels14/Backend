@@ -71,47 +71,72 @@ export class GruposService {
     return this.findByUsuario(userId);
   }
 
-  async findMiembros(grupoId: number): Promise<GrupoPersona[]> {
-    return this.grupoPersonaRepository.find({
-      where: {
-        grupo: { id: grupoId },
-      },
-      order: {
-        fechaUnion: 'ASC',
-      },
+  async findMiembros(grupoId: number): Promise<any[]> {
+    const miembros = await this.grupoPersonaRepository.find({
+      where: { grupo: { id: grupoId } },
+      order: { fechaUnion: 'ASC' },
     });
+
+    return miembros.map(m => ({
+      id: m.id,
+      usuarioId: m.userId,
+      nombre: m.nombre,
+      rol: m.rol === 'admin' ? 'ADMIN' : 'MEMBER',
+      unidoEn: m.fechaUnion,
+      bloqueadoEn: m.bloqueado ? new Date().toISOString() : null,
+    }));
   }
 
   // =========================
   // CREATE (VERSIÓN NUEVA)
   // =========================
 
-  async create(
-    dto: CreateGrupoDto,
-    userId: string,
-  ): Promise<Grupo> {
-    const grupo = this.grupoRepository.create({
-      nombre: dto.nombre,
-      descripcion: dto.descripcion,
-      imagen: dto.imagen,
-      tipo: dto.tipo ?? 'PUBLIC',
-      creadoPor: userId,
-      activo: true,
+async create(dto: CreateGrupoDto, userId: string): Promise<Grupo> {
+  const grupo = this.grupoRepository.create({
+    nombre: dto.nombre,
+    descripcion: dto.descripcion,
+    imagen: dto.imagen,
+    tipo: dto.tipo ?? 'PUBLIC',
+    creadoPor: userId,
+    activo: true,
+  });
+
+  const grupoGuardado = await this.grupoRepository.save(grupo);
+
+  // Agregar al creador como admin
+  const admin = this.grupoPersonaRepository.create({
+    userId,
+    nombre: 'Administrador',
+    rol: 'admin',
+    grupo: grupoGuardado,
+  });
+  await this.grupoPersonaRepository.save(admin);
+
+  // Agregar los miembros adicionales
+  if (dto.miembros && dto.miembros.length > 0) {
+    const miembros = dto.miembros.map(m =>
+      this.grupoPersonaRepository.create({
+        userId: m.userId,
+        nombre: m.nombre,
+        rol: 'miembro',
+        grupo: grupoGuardado,
+      }),
+    );
+    await this.grupoPersonaRepository.save(miembros);
+
+    // Notificar a cada miembro
+    dto.miembros.forEach(m => {
+      this.mensajeriaGateway.enviarMensajeDirecto(m.userId, {
+        tipo: 'bienvenida_grupo',
+        grupoId: grupoGuardado.id,
+        grupoNombre: grupoGuardado.nombre,
+        mensaje: `Fuiste agregado al grupo "${grupoGuardado.nombre}"`,
+      });
     });
-
-    const grupoGuardado = await this.grupoRepository.save(grupo);
-
-    const admin = this.grupoPersonaRepository.create({
-      userId,
-      nombre: 'Administrador',
-      rol: 'admin',
-      grupo: grupoGuardado,
-    });
-
-    await this.grupoPersonaRepository.save(admin);
-
-    return this.findOne(grupoGuardado.id!);
   }
+
+  return this.findOne(grupoGuardado.id!);
+}
 
   // =========================
   // CREATE (LEGACY)
@@ -222,47 +247,59 @@ export class GruposService {
     return this.grupoPersonaRepository.save(miembro);
   }
 
-  async salir(
-    grupoId: number,
-    userId: string,
-  ): Promise<any> {
-    const miembro =
-      await this.grupoPersonaRepository.findOne({
-        where: {
-          grupo: { id: grupoId },
-          userId,
-        },
-      });
+async salir(
+  grupoId: number,
+  userId: string,
+): Promise<any> {
+  const miembro = await this.grupoPersonaRepository.findOne({
+    where: {
+      grupo: { id: grupoId },
+      userId,
+    },
+  });
 
-    if (!miembro) {
-      throw new NotFoundException(
-        'No eres miembro de este grupo',
+  if (!miembro) {
+    throw new NotFoundException('No eres miembro de este grupo');
+  }
+
+  if (miembro.rol === 'admin') {
+    const admins = await this.grupoPersonaRepository.count({
+      where: {
+        grupo: { id: grupoId },
+        rol: 'admin',
+      },
+    });
+
+    if (admins <= 1) {
+      throw new BadRequestException(
+        'Eres el único administrador. Promueve a otro antes de salir.',
       );
     }
-
-    if (miembro.rol === 'admin') {
-      const admins =
-        await this.grupoPersonaRepository.count({
-          where: {
-            grupo: { id: grupoId },
-            rol: 'admin',
-          },
-        });
-
-      if (admins <= 1) {
-        throw new BadRequestException(
-          'Eres el único administrador. Promueve a otro antes de salir.',
-        );
-      }
-    }
-
-    await this.grupoPersonaRepository.remove(miembro);
-
-    return {
-      success: true,
-      mensaje: 'Saliste del grupo correctamente',
-    };
   }
+
+  // Buscar el grupo para tener el nombre en la notificación
+  const grupo = await this.findOne(grupoId);
+
+  await this.grupoPersonaRepository.remove(miembro);
+
+  // Notificar a los admins
+  const admins = await this.grupoPersonaRepository.find({
+    where: { grupo: { id: grupoId }, rol: 'admin' },
+  });
+
+  admins.forEach(admin => {
+    this.mensajeriaGateway.enviarMensajeDirecto(admin.userId!, {
+      tipo: 'miembro_salio',
+      grupoId,
+      mensaje: `Un miembro abandonó el grupo "${grupo.nombre}"`,
+    });
+  });
+
+  return {
+    success: true,
+    mensaje: 'Saliste del grupo correctamente',
+  };
+}
 
   async removerMiembro(
     grupoId: number,
